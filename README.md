@@ -1,34 +1,53 @@
 # 🛍️ Fusion Store
 
-A modern, high-performance, and secure e-commerce application built on **Next.js 16 (App Router)** and **MongoDB**. This project features a robust role-based authentication system, modern Tailwind CSS v4 styling, and a clean, feature-driven directory structure.
+A high-performance, secure, and visually stunning e-commerce platform built on **Next.js 16 (App Router)** and **MongoDB**. Designed with a premium high-contrast dark aesthetic with vibrant electric blue highlights, the store incorporates a custom studio, real-time drop countdowns, and robust role-based access controls.
 
 ---
 
-## 🚀 Key Features
+## ✨ Core Capabilities
 
-- **🔐 NextAuth.js v5 (Auth.js)**: Fully integrated authentication with support for:
-  - **Credentials Provider** (Email & Password)
-  - **Google OAuth Provider**
-  - Custom JWT session callback passing user IDs and roles.
-- **🛡️ Role-Based Access Control**:
-  - Distinct **ADMIN** and **CUSTOMER** roles.
-  - Route protection via custom Edge-ready Next.js **Middleware** to block unauthorized access to admin dashboards.
-- **🗄️ MongoDB & Mongoose Integration**:
-  - Optimized database connection cache inside serverless functions to prevent connection leaks during hot reloads.
-  - Schemas defined with full TypeScript support (e.g., User Model with role enums).
-- **🎨 Tailwind CSS v4**: Beautiful, responsive, and state-of-the-art styling with PostCSS.
-- **📂 Modular Architecture**: Structured following a feature-based organization pattern to ensure scalability and ease of maintenance.
+### 1. Unified Authentication & Profiles
+- **Social & Credentials Logins**: Secure sign-in flows using **Google OAuth** and standard email/password credentials via **Auth.js v5 (NextAuth)**.
+- **Dynamic Profile Dashboard**: Customers can track order history, active customization requests, and delivery status in real-time.
+
+### 2. Immersive Storefront & Stock Engine
+- **Active Drop Countdown**: Homepage features a real-time countdown timer for upcoming drops, preventing purchases until the drop goes live.
+- **Scarcity & Stock Protection**: Dynamic stock tracking that automatically adds scarcity badges (e.g., "Limited Edition" for low-stock items), decrements counts during checkout, and disables purchasing once stock hits zero.
+- **Advanced Filtering**: Client-side sorting and filtering by collection, price, size, and color.
+
+### 3. Customization Studio (`/customize`)
+- **Interactive Builder**: An intuitive multi-step form allowing users to submit bespoke apparel requests (specifying base product type, colors, and print locations).
+- **Secure File Storage**: Integrated image uploading for client artwork, processed and stored via Cloudinary.
+- **Workflow Pipeline**: Automated status transition tracking custom orders from "Pending" review through to admin-managed custom pricing.
+
+### 4. Persistent Shopping Cart & Checkout
+- **Zustand State Engine**: Highly optimized, lightweight local state management that persists across browser sessions using local storage, eliminating unnecessary global app re-renders.
+- **Secure Payment Gateway**: Integrates tokenized payment processors (Stripe/Paymob) to handle card transactions without exposing credit card details to internal databases.
+
+### 5. Admin Control Center
+- **Inventory & Drop Manager**: Control interface to toggle drop schedules, create/update products, and set stock scarcity.
+- **Custom Order Review**: Queue to review uploaded artwork, approve/reject custom designs, and issue custom pricing links directly to the client's dashboard.
+
+---
+
+## ⚙️ Technical Architecture & NFRs
+
+- **⚡ Server-Side Rendering (SSR)**: Leveraging Next.js Server Components for pre-rendered listings to ensure a Largest Contentful Paint (LCP) under 2.5 seconds.
+- **🖼️ Dynamic Image Optimization**: Automated format conversion (WebP/AVIF) and quality compression for uploaded and product assets.
+- **🛡️ Secure Route Guarding**: Custom Edge-ready Next.js Middleware guarding `/admin` and user profile directories from unauthorized access.
+- **💾 Database Concurrency**: Safe MongoDB checkouts utilizing guarded write operations to prevent overselling limited-edition inventory.
+- **🏗️ Serverless Ready**: Stateless Server Actions and API routes ready for seamless horizontal scaling on Vercel.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Core**: Next.js 16 (App Router), React 19, TypeScript
-- **Database**: MongoDB & Mongoose
-- **Authentication**: NextAuth.js v5 (beta)
-- **Security**: Bcrypt.js (Password Hashing)
+- **Framework**: Next.js 16 (App Router), React 19
+- **State Management**: Zustand
+- **Database & ODM**: MongoDB / Mongoose
+- **Security & Auth**: Auth.js (v5), Bcrypt.js
 - **Styling**: Tailwind CSS v4, PostCSS
-- **Linting**: ESLint
+- **Media Hosting**: Cloudinary
 
 ---
 
@@ -38,75 +57,61 @@ A modern, high-performance, and secure e-commerce application built on **Next.js
 fusion-store/
 ├── src/
 │   ├── app/                 # Next.js App Router (Layouts & Pages)
-│   │   ├── admin/           # Admin-only dashboard
-│   │   ├── api/             # API Route Handlers (e.g., auth routes)
+│   │   ├── admin/           # Protected Admin views
+│   │   ├── api/             # API Handlers (including Auth.js routes)
 │   │   ├── products/        # Product page views
-│   │   ├── globals.css      # Core Tailwind CSS imports
-│   │   └── page.tsx         # Landing page
-│   ├── config/              # Application-wide configurations
+│   │   └── page.tsx         # Storefront landing page
 │   ├── features/            # Feature-driven domain modules
-│   │   ├── admin/           # Admin logic & components
-│   │   ├── auth/            # Auth logic (login, register actions)
-│   │   ├── cart/            # Shopping cart management
-│   │   ├── custom-orders/   # Custom orders handling
-│   │   ├── orders/          # Checkout and order flows
-│   │   └── products/        # Product listing & details logic
-│   ├── lib/                 # Shared libraries (database connection, auth configs)
-│   │   ├── auth.ts          # NextAuth v5 configuration and callbacks
-│   │   └── mongodb.ts       # Type-safe cached MongoDB client helper
-│   ├── models/              # Mongoose Database Models (e.g., User schema)
+│   │   ├── admin/           # Admin logic & review queues
+│   │   ├── auth/            # Authentication actions and forms
+│   │   ├── cart/            # Zustand cart store & drawer
+│   │   ├── custom-orders/   # Customization Studio state & upload components
+│   │   └── products/        # Catalog, filters, and countdown timer
+│   ├── lib/                 # Third-party wrappers (Mongoose connection, auth configurations)
+│   ├── models/              # MongoDB/Mongoose database schemas
 │   ├── shared/              # Reusable generic UI components and hooks
-│   └── types/               # Global TypeScript declarations (e.g., NextAuth types)
-├── middleware.ts            # Next.js route protection and session inspection
-├── next.config.ts           # Next.js settings
-├── package.json             # NPM dependencies and scripts
-└── tsconfig.json            # TypeScript configuration
+│   └── types/               # TypeScript definitions
+├── middleware.ts            # Route guarding middleware
+├── package.json             # NPM configuration
+└── tsconfig.json            # Strict TypeScript configuration
 ```
 
 ---
 
-## ⚙️ Getting Started
+## 🚀 Setup & Local Development
 
 ### 1. Prerequisites
-Ensure you have **Node.js 18+** and a running **MongoDB** cluster (or local instance).
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+- Cloudinary credentials
 
-### 2. Environment Setup
-Create a `.env` file in the root directory and define the following variables:
+### 2. Environment Variables
+Configure the following in a `.env` file at the root:
 ```env
-DB_URL="your-mongodb-connection-string"
-MONGODB_URI="your-mongodb-connection-string" # Used by connection helper
-
-# NextAuth Configuration
-NEXTAUTH_SECRET="your-super-secret-key"
-AUTH_SECRET="your-super-secret-key" # Used by NextAuth v5
-
-# Google Provider Configuration
-GOOGLE_ID="your-google-client-id"
-GOOGLE_SECRET="your-google-client-secret"
+MONGODB_URI="your-mongodb-connection-string"
+AUTH_SECRET="your-nextauth-secret-key"
+GOOGLE_ID="google-client-id"
+GOOGLE_SECRET="google-client-secret"
+CLOUDINARY_URL="cloudinary-connection-url"
 ```
 
-### 3. Installation
-Install the project dependencies:
+### 3. Quickstart
 ```bash
+# Install dependencies
 npm install
-```
 
-### 4. Running the Development Server
-Start the development server locally:
-```bash
+# Start local server
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) with your browser to explore the store.
 
 ---
 
-## 🧪 Quality and Type Checks
-To perform strict type-checking:
+## 🧪 Diagnostics & Validation
+Ensure strict type-safety:
 ```bash
 npx tsc --noEmit
 ```
-
-To run lint checks:
+Validate code style:
 ```bash
 npm run lint
 ```
